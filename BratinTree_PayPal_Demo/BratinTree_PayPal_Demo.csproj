@@ -131,21 +131,69 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PayPalController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="PayPalModels\PayPalAPI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Themes\css\app.css" />
+    <Content Include="App_Themes\css\overrides.css" />
+    <Content Include="App_Themes\images\bt-drop-in-placeholder.png" />
+    <Content Include="App_Themes\images\favicon.png" />
+    <Content Include="App_Themes\javascript\demo.js" />
+    <Content Include="App_Themes\javascript\vendor\jquery-2.1.1.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\jquery-2.1.1.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="App_Themes\css\app.css.map" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Bold.eot" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Bold.svg" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Bold.woff" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Bold.woff2" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Medium.eot" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Medium.svg" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Medium.woff" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Medium.woff2" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Regular.eot" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Regular.svg" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Regular.woff" />
+    <Content Include="App_Themes\fonts\bt-mono\bt-mono-Regular.woff2" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Bold-webfont.eot" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Bold-webfont.svg" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Bold-webfont.ttf" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Bold-webfont.woff" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Light-webfont.eot" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Light-webfont.svg" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Light-webfont.ttf" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Light-webfont.woff" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Regular-webfont.eot" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Regular-webfont.svg" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Regular-webfont.ttf" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Regular-webfont.woff" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Semibold-webfont.eot" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Semibold-webfont.svg" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Semibold-webfont.ttf" />
+    <Content Include="App_Themes\fonts\open-sans\OpenSans-Semibold-webfont.woff" />
+    <Content Include="App_Themes\images\cards\amex.svg" />
+    <Content Include="App_Themes\images\cards\discover.svg" />
+    <Content Include="App_Themes\images\cards\mastercard.svg" />
+    <Content Include="App_Themes\images\cards\visa.svg" />
+    <Content Include="App_Themes\images\check.svg" />
+    <Content Include="App_Themes\images\fail.svg" />
+    <Content Include="App_Themes\images\paypal-demo.svg" />
+    <Content Include="App_Themes\images\paypal.svg" />
+    <Content Include="App_Themes\images\pseudoshop.svg" />
+    <Content Include="App_Themes\images\success.svg" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -171,10 +219,10 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\PayPal\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

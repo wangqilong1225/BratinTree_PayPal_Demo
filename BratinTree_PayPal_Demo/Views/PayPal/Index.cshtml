@@ -1,0 +1,323 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div class="wrapper">
+    <div class="checkout container">
+        <header>
+            <h1>
+                Hi,
+                <br>
+                Let's test a transaction
+            </h1>
+            <p>
+                Make a test payment with Braintree using PayPal or a card
+            </p>
+        </header>
+
+        <form id="payment-form" method="post" action="/PayPal/SendNonce">
+            <section>
+                <label for="amount">
+                    <span class="input-label">Amount</span>
+                    <div class="input-wrapper amount-wrapper">
+                        <input id="amount" name="amount" type="tel" min="0.01" placeholder="Amount" value="0.01">
+                    </div>
+                </label>
+
+                <fieldset>
+                    <legend>Card</legend>
+
+                    <div class="cardinfo-card-number">
+                        <label class="cardinfo-label" for="cc-number">Card Number</label>
+                        <div class='input-wrapper' id="cc-number"></div>
+                        <div id="card-image"></div>
+                    </div>
+
+                    <div class="cardinfo-card-number">
+                        <label class="cardinfo-label" for="cc-number">CVV</label>
+                        <div class='input-wrapper' id="cc-cvv"></div>
+                    </div>
+
+                    <div class="cardinfo-card-number">
+                        <label class="cardinfo-label" for="cc-expiration-date">Expiration-Date</label>
+                        <div class='input-wrapper' id="cc-expiration-date"></div>
+                    </div>
+                    <button style="margin-top: 10px; background-color: pink;" class="button" id="card-button" type="button"><span style="padding: 0.7em 1em">Done</span></button>
+                </fieldset>
+                <fieldset>
+                    <legend>Paypal</legend>
+                    <button style="margin-top: 10px; background-color: pink;" class="button" id="paypal-button" type="button"><span>Paypal</span></button>
+                    <span id="payer"></span>
+                </fieldset>
+            </section>
+
+            <input id="nonce" name="payment_method_nonce" type="hidden" />
+            <button class="button" type="submit"><span>Test Transaction</span></button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .cardinfo-card-number {
+        position: relative;
+    }
+
+    .cardinfo-label {
+        display: block;
+        font-size: 11px;
+        margin-bottom: 0.5em;
+        text-transform: uppercase;
+    }
+
+    .input-wrapper {
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.86);
+        height: 2.75em;
+        border: 1px solid #eee;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+        padding: 5px 10px;
+        margin-bottom: 1em;
+    }
+
+    #card-image {
+        position: absolute;
+        top: 36px;
+        right: 0px;
+        width: 44px;
+        height: 28px;
+        background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/346994/card_sprite.png);
+        background-size: 86px 458px;
+        border-radius: 4px;
+        background-position: -100px 0;
+        background-repeat: no-repeat;
+        margin-bottom: 1em;
+    }
+
+        #card-image.visa {
+            background-position: 0 -398px;
+        }
+
+        #card-image.master-card {
+            background-position: 0 -281px;
+        }
+
+        #card-image.american-express {
+            background-position: 0 -370px;
+        }
+
+        #card-image.discover {
+            background-position: 0 -163px;
+        }
+
+        #card-image.maestro {
+            background-position: 0 -251px;
+        }
+
+        #card-image.jcb {
+            background-position: 0 -221px;
+        }
+
+        #card-image.diners-club {
+            background-position: 0 -133px;
+        }
+</style>
+<script src="~/Content/jquery-2.1.1.js"></script>
+
+<script src="https://js.braintreegateway.com/web/3.29.0/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.29.0/js/hosted-fields.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.29.0/js/paypal.js"></script>
+<script src="https://js.braintreegateway.com/web/3.29.0/js/paypal-checkout.js"></script>
+<script src="https://js.braintreegateway.com/web/3.29.0/js/three-d-secure.js"></script>
+
+<script>
+    $(document).ready(function () {
+        //GET 请求去拿TOKEN
+        $.get("/PayPal/GetPayPalClienToken", function (Data) {       
+            $(function () {
+                var client_token = Data;
+                var paypalButton = document.querySelector('#paypal-button');
+                var cardButton = document.querySelector('#card-button');
+
+                braintree.client.create({
+                    authorization: client_token         //身份验证
+                }, function (clientErr, clientInstance)
+                   {  
+                        if (clientErr) {
+                            //console.error('Error creating client:', clientErr);
+                            return;
+                        }
+
+                        //PayPal 支付
+                        braintree.paypal.create({
+                            client: clientInstance      //客户端实例
+                        }, function (paypalErr, paypalInstance) {
+                            if (paypalErr) {
+                                console.error('Error creating PayPal:', paypalErr);
+                                return;
+                            }
+                            paypalButton.removeAttribute('disabled');
+                            paypalButton.addEventListener('click', function (event) {
+                                // Because tokenization opens a popup, this has to be called as a result of
+                                // customer action, like clicking a button. You cannot call this at any time.
+                                paypalInstance.tokenize({
+                                    flow: 'checkout',
+                                    amount: document.querySelector('#amount').value,
+                                    currency: 'AUD',
+                                    //billingAddress: {
+                                    //    Company="mwave",
+                                    //    CountryName= "australia",
+                                    //    LastName="qilong"
+                                    //}
+                                    //biFirstName="W",llingAgreementDescription: 'Your agreement description',
+                                    //enableShippingAddress: true,
+                                    //shippingAddressEditable: false,
+                                    //billingAddressOverride: {
+                                    //    recipientName: 'Scruff McGruff',
+                                    //    line1: '1234 Main St.',
+                                    //    line2: 'Unit 1',
+                                    //    city: 'Chicago',
+                                    //    countryCode: 'AUD',
+                                    //    postalCode: '60652',
+                                    //    state: 'IL',
+                                    //    phone: '123.456.7890'
+                                    //}
+                                    // For more tokenization options, see the full PayPal tokenization documentation
+                                    // http://braintree.github.io/braintree-web/current/PayPal.html#tokenize
+                                }, function (tokenizeErr, payload) {
+                                    if (tokenizeErr) {
+                                        if (tokenizeErr.type !== 'CUSTOMER') {
+                                            console.log('Error tokenizing:', tokenizeErr);
+                                        }
+                                        return;
+                                    }
+                                    // Tokenization succeeded
+                                    document.querySelector('#nonce').value = payload.nonce;
+                                    $("#payer").html(payload.details.email);
+                                    paypalButton.firstChild.innerHTML = "switch account";
+                                    console.log('Paypal Got nonce:', payload.nonce);
+                                });
+                            }, false);
+                    });
+
+
+                    ///////////////////////////////////////////////信用卡支付
+                    // Create input fields and add text styles
+                    braintree.hostedFields.create({
+                        client: clientInstance,  //****
+                        // Add information for individual fields
+                        fields: {
+                            number: {
+                                selector: '#cc-number',
+                                placeholder: '1111 1111 1111 1111'
+                            },
+                            cvv: {
+                                selector: '#cc-cvv',
+                                placeholder: '123'
+                            },
+                            expirationDate: {
+                                selector: '#cc-expiration-date',
+                                placeholder: '10 / 2019'
+                            }
+                        }
+                    }, function (err, hostedFieldsInstance) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+
+                        hostedFieldsInstance.on('cardTypeChange', function (event) {
+                            // Change card bg depending on card type
+                            if (event.cards.length === 1) {
+                                //$(form).removeClass().addClass(event.cards[0].type);
+                                $('#card-image').removeClass().addClass(event.cards[0].type);
+                                //$('header').addClass('header-slide');
+
+                                // Change the CVV length for AmericanExpress cards
+                                if (event.cards[0].code.size === 4) {
+                                    hostedFieldsInstance.setAttribute({
+                                        field: 'cvv',
+                                        attribute: 'placeholder',
+                                        value: '1234'
+                                    });
+                                }
+                            } else {
+                                hostedFieldsInstance.setAttribute({
+                                    field: 'cvv',
+                                    attribute: 'placeholder',
+                                    value: '123'
+                                });
+                            }
+                        });
+
+                        cardButton.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            hostedFieldsInstance.tokenize(function (err, payload) {
+                                if (err) {
+                                    console.log(err);
+                                    return;
+                                }
+
+                                var a = payload.details.cardType;
+                                var b = payload.details.lastFour;
+                                //document.querySelector('#nonce').value = payload.nonce;
+                                // This is where you would submit payload.nonce to your server
+                                var my3DSContainer;
+                                braintree.threeDSecure.create({
+                                    client: clientInstance
+                                }, function (threeDSecureErr, threeDSecure) {
+                                    if (threeDSecureErr) {
+                                        console.log("Error creating 3DSecure" + threeDSecureErr);
+                                        return;
+                                    }
+                                    else {
+                                        threeDSecure.verifyCard({
+                                            nonce: payload.nonce,
+                                            amount: document.querySelector('#amount').value,
+                                            addFrame: function (err, iframe) {
+                                                // Set up your UI and add the iframe.
+                                                my3DSContainer = document.createElement('div');
+                                                my3DSContainer.appendChild(iframe);
+                                                document.body.appendChild(my3DSContainer);
+                                            },
+                                            removeFrame: function () {
+                                                //Remove UI that you added in addFrame.
+                                                document.body.removeChild(my3DSContainer);
+                                            }
+                                        }, function (err, thpayload) {
+                                            if (err) {
+                                                console.log(err);
+                                                return;
+                                            }
+                                            //hostedFieldsInstance.clear('number');
+                                            //hostedFieldsInstance.clear('cvv');
+                                            //hostedFieldsInstance.clear('expirationDate');
+                                            debugger;
+                                            if (thpayload.liabilityShiftPossible) {
+                                                if (thpayload.liabilityShifted) {
+                                                    //Liablity has shifted
+                                                    //submitNonceToServer(payload.nonce);
+                                                    document.querySelector('#nonce').value = thpayload.nonce;
+                                                    console.log('Card Got nonce:', thpayload.nonce);
+
+                                                } else {
+                                                    console.log("Invalid Card!");
+                                                }
+                                            } else {
+                                                document.querySelector('#nonce').value = thpayload.nonce;
+                                                console.log('No3D nonce:', thpayload.nonce);
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }, false);
+                    });
+                });
+            });
+        });
+    });
+</script>
+
+
+
