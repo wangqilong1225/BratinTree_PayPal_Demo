@@ -4,60 +4,70 @@
 
 <div class="wrapper">
     <div class="checkout container">
-        <header>
-            <h1>
-                Hi,
-                <br>
-                Let's test a transaction
-            </h1>
-            <p>
-                Make a test payment with Braintree using PayPal or a card
-            </p>
-        </header>
-
-        <form id="payment-form" method="post" action="/PayPal/SendNonce">
-            <section>
+        <div style="text-align:center;">
+            <span style="font-size:22px;">PayPal支付SandBox演示</span>
+        </div>
+        <br />
+        <form id="payment-form" method="post" action="/PayPal/SendNonce" style="width: 500px; border: 2px solid black;margin-left: 31%; height: 350px;">
+            <section style="text-align: center;" id="sectionID">
+                <br /><br />
                 <label for="amount">
-                    <span class="input-label">Amount</span>
-                    <div class="input-wrapper amount-wrapper">
-                        <input id="amount" name="amount" type="tel" min="0.01" placeholder="Amount" value="0.01">
-                    </div>
+                    <span class="input-label" style="font-size: 16px;">Amount:</span>
+                    <input id="amount" name="amount" type="tel" min="0.01" placeholder="Amount" value="0.01">
                 </label>
 
-                <fieldset>
-                    <legend>Card</legend>
+                @*<fieldset>
+                <legend>Card</legend>
 
-                    <div class="cardinfo-card-number">
-                        <label class="cardinfo-label" for="cc-number">Card Number</label>
-                        <div class='input-wrapper' id="cc-number"></div>
-                        <div id="card-image"></div>
-                    </div>
+                <div class="cardinfo-card-number">
+                    <label class="cardinfo-label" for="cc-number">Card Number</label>
+                    <div class='input-wrapper' id="cc-number"></div>
+                    <div id="card-image"></div>
+                </div>
 
-                    <div class="cardinfo-card-number">
-                        <label class="cardinfo-label" for="cc-number">CVV</label>
-                        <div class='input-wrapper' id="cc-cvv"></div>
-                    </div>
+                <div class="cardinfo-card-number">
+                    <label class="cardinfo-label" for="cc-number">CVV</label>
+                    <div class='input-wrapper' id="cc-cvv"></div>
+                </div>
 
-                    <div class="cardinfo-card-number">
-                        <label class="cardinfo-label" for="cc-expiration-date">Expiration-Date</label>
-                        <div class='input-wrapper' id="cc-expiration-date"></div>
-                    </div>
-                    <button style="margin-top: 10px; background-color: pink;" class="button" id="card-button" type="button"><span style="padding: 0.7em 1em">Done</span></button>
-                </fieldset>
-                <fieldset>
-                    <legend>Paypal</legend>
-                    <button style="margin-top: 10px; background-color: pink;" class="button" id="paypal-button" type="button"><span>Paypal</span></button>
-                    <span id="payer"></span>
-                </fieldset>
+                <div class="cardinfo-card-number">
+                    <label class="cardinfo-label" for="cc-expiration-date">Expiration-Date</label>
+                    <div class='input-wrapper' id="cc-expiration-date"></div>
+                </div>
+                <button style="margin-top: 10px; background-color: pink;" class="button" id="card-button" type="button"><span style="padding: 0.7em 1em">Done</span></button>
+            </fieldset>
+            <fieldset>
+                <legend>Paypal</legend>
+                <button style="margin-top: 10px; background-color: pink;" class="button" id="paypal-button" type="button"><span>Paypal</span></button>
+                <span id="payer"></span>
+            </fieldset>*@
             </section>
 
             <input id="nonce" name="payment_method_nonce" type="hidden" />
-            <button class="button" type="submit"><span>Test Transaction</span></button>
+            <img style="margin-left: 33%; margin-top: 8%;" id="paypal-button" src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/34_Grey_CheckOut_Pill_Button.png">
+            <div id="shippingID">
+                <br />
+                <span class="shipClass" style="font-size: 18px;font-weight: bold; margin-left: 35%;">Shipping   Address</span><br />
+                <hr />
+                <span class="shipClass" style="font-size: 16px;">FirstName:</span>&nbsp; <input name="" id="payerFirstName" /><br />
+                <span class="shipClass" style="font-size: 16px;">LastName:</span>&nbsp;&nbsp; <input name="LastName" id="payerLastName"><br />
+                <span class="shipClass" style="font-size: 16px;">Email:</span>&nbsp; <input name="Email" id="payerEmail"><br />
+                <span class="shipClass" style="font-size: 16px;">City: </span>&nbsp;&nbsp;&nbsp;&nbsp; <input name="City" id="payerCity"><br />
+                <span class="shipClass" style="font-size: 16px;">Line1:</span>&nbsp; <input name="Line1" id="payerLine1"><br />
+                <span class="shipClass" style="font-size: 16px;">Line2:</span>&nbsp; <input name="Line2" id="payerLine2"><br />
+                <span class="shipClass" style="font-size: 16px;">PostalCode:</span>&nbsp; <input name="PostalCode" id="payerPostalCode"><br /><br />
+                <img style="margin-left: 34%;" id="btnSubimit" src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/34_Grey_CheckOut_Pill_Button.png">
+            </div>
         </form>
     </div>
 </div>
 
 <style>
+    .shipClass 
+    {
+        margin-left:27%;
+    }
+
     .cardinfo-card-number {
         position: relative;
     }
@@ -132,6 +142,12 @@
 
 <script>
     $(document).ready(function () {
+        $("#shippingID").hide();
+
+        $("#btnSubimit").click(function () {
+            $("#payment-form").submit();
+        });
+
         //GET 请求去拿TOKEN
         $.get("/PayPal/GetPayPalClienToken", function (Data) {       
             $(function () {
@@ -157,7 +173,7 @@
                                 return;
                             }
                             paypalButton.removeAttribute('disabled');
-                            paypalButton.addEventListener('click', function (event) {
+                            paypalButton.addEventListener('click', function (event) {   //支付按钮监听事件
                                 // Because tokenization opens a popup, this has to be called as a result of
                                 // customer action, like clicking a button. You cannot call this at any time.
                                 paypalInstance.tokenize({
@@ -193,7 +209,16 @@
                                     }
                                     // Tokenization succeeded
                                     document.querySelector('#nonce').value = payload.nonce;
-                                    $("#payer").html(payload.details.email);
+                                    $("#paypal-button").hide();
+                                    $("#sectionID").hide();
+                                    $("#shippingID").show();
+                                    $("#payerFirstName").val(payload.details.firstName);
+                                    $("#payerLastName").val(payload.details.lastName);
+                                    $("#payerLine1").val(payload.details.shippingAddress.line1);
+                                    $("#payerLine2").val(payload.details.shippingAddress.line2);
+                                    $("#payerEmail").val(payload.details.email);
+                                    $("#payerCity").val(payload.details.shippingAddress.city);
+                                    $("#payerPostalCode").val(payload.details.shippingAddress.postalCode);
                                     paypalButton.firstChild.innerHTML = "switch account";
                                     console.log('Paypal Got nonce:', payload.nonce);
                                 });

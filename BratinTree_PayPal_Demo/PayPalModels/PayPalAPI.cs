@@ -16,8 +16,8 @@ namespace BratinTree_PayPal_Demo.PayPalModels
         private string PublicKey { get; set; }
         private string PrivateKey { get; set; }
         #endregion
-        
-        //Create Braintree Gateway
+
+        //Create Braintree Gateway Braintree网关初始化
         public BraintreeGateway CreateGateway()
         {
             Environment = System.Environment.GetEnvironmentVariable("BraintreeEnvironment");
@@ -43,7 +43,8 @@ namespace BratinTree_PayPal_Demo.PayPalModels
             return ClientToken;
         }
 
-        public string SendNonce(decimal amount, string nonce)
+        //支付
+        public string SendNonce(decimal amount, string nonce, ShippingAddress shippingAddress)
         {
             BraintreeGateway gateway = CreateGateway();
             var request = new TransactionRequest
@@ -54,24 +55,24 @@ namespace BratinTree_PayPal_Demo.PayPalModels
                 {
                     SubmitForSettlement = true
                 },
-                CustomerId="14",
                 ShippingAddress = new AddressRequest
                 {
-                    Company = "base",
-                    CountryName = "china",
-                    LastName = "ming",
-                    FirstName = "X"
+                    FirstName = shippingAddress.FirstName,
+                    LastName = shippingAddress.LastName,
+                    PostalCode= shippingAddress.PostalCode,
+                    StreetAddress= shippingAddress.Line1+ shippingAddress.Line2,
                 }
             };
+            //网关支付
             Result<Transaction> result = gateway.Transaction.Sale(request);
+            //支付成功
             if (result.IsSuccess())
             {
                 Transaction transaction = result.Target;
-                //return RedirectToAction("Show", new { id = transaction.Id });  //9wrj2n45
             }
             else if (result.Transaction != null)
             {
-              //  return RedirectToAction("Show", new { id = result.Transaction.Id });
+                return "Transaction is null,Id=" + result.Transaction.Id;
             }
             else
             {
@@ -80,15 +81,9 @@ namespace BratinTree_PayPal_Demo.PayPalModels
                 {
                     errorMessages += "Error: " + (int)error.Code + " - " + error.Message + "\n";
                 }
-               // TempData["Flash"] = errorMessages;
-                //return RedirectToAction("New");
+                return errorMessages;
             }
-            Transaction transaction2 = gateway.Transaction.Find("9wrj2n45");
-            return null;
+            return "支付完成！";
         }
-
-
     }
-
-    
 }

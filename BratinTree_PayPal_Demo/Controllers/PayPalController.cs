@@ -12,11 +12,10 @@ namespace BratinTree_PayPal_Demo.Controllers
         PayPalAPI payPalAPI = new PayPalAPI();
         public ActionResult Index()
         {
-            ViewBag.ClientToken = payPalAPI.GetPayPalClientToken();
             return View();
         }
 
-        //GET
+        //获取TOKEN
         public string GetPayPalClienToken()
         {
             ViewBag.ClientToken = payPalAPI.GetPayPalClientToken();
@@ -25,22 +24,31 @@ namespace BratinTree_PayPal_Demo.Controllers
 
         public string SendNonce()
         {
-            //var gateway = config.GetGateway();
             decimal amount=0.0m;
-
+            //获取收货地址信息
+            ShippingAddress shippingAddress = new ShippingAddress();
             try
             {
                 amount =Convert.ToDecimal(Request["amount"]);
+                shippingAddress = new ShippingAddress {
+                    FirstName = Request["FirstName"],
+                    LastName= Request["LastName"],
+                    Email= Request["Email"],
+                    City= Request["City"],
+                    Line1= Request["Line1"],
+                    Line2= Request["Line2"],
+                    PostalCode= Request["PostalCode"]
+                };
             }
             catch (FormatException e)
-            {
-                TempData["Flash"] = "Error: 81503: Amount is an invalid format.";
-                //return RedirectToAction("New");
+            {               
+                return e.Message;
             }
 
+            //获取nonce
             var nonce = Request["payment_method_nonce"];
 
-            return payPalAPI.SendNonce(amount, nonce);
+            return payPalAPI.SendNonce(amount, nonce, shippingAddress);
         }
     }
 }
